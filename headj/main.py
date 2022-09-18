@@ -56,7 +56,13 @@ def main():
         default=DEF_SKIP,
         help="Number of elements to skip before copying (default: %(default)s)",
     )
-    parser.add_argument("-f", "--format", action="store_true", dest="format_json")
+    parser.add_argument(
+        "-f",
+        "--format",
+        action="store_true",
+        dest="format_json",
+        help="Nicely format the output JSON with indentation & newlines.",
+    )
     parser.add_argument(
         "-o",
         "--output",

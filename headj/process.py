@@ -1,12 +1,16 @@
 import json_stream
 from pprintpp import pformat
 import sys
-from typing import IO, Iterable, List
+from typing import Any, IO, Iterable, List
 from headj.h_error import h_error
 
 DEF_COUNT: int = 100
 DEF_INDENT: int = 5
 DEF_SKIP: int = 0
+
+
+class JSONProcessingError(Exception):
+    """"""
 
 
 def run_headj(
@@ -26,19 +30,17 @@ def run_headj(
         h_error.debug("Keys = %r", keys)
         the_json = json_stream.load(infile)
         json_out = process(the_json, count, skip, keys)
-        # This would cause issues if json_out is large
-        if format_json:
-            text_out = pformat(json_out, indent=DEF_INDENT)
-        else:
-            text_out = str(json_out)
+        text_out = post_process(json_out, keys, format_json)
         output.write(text_out)
+    except JSONProcessingError as e:
+        h_error.debug(str(e))
     except Exception as e:
         h_error.print(e)
     finally:
         output.close()
 
 
-def process(the_json, count: int, skip: int, keys: Iterable[str]) -> List:
+def process(the_json, count: int, skip: int, keys: Iterable[str]) -> List[Any]:
     """"""
     obj = the_json
     json_out = []
@@ -53,7 +55,14 @@ def process(the_json, count: int, skip: int, keys: Iterable[str]) -> List:
                 key,
                 pformat(obj, indent=DEF_INDENT),
             )
-            return []
+            raise JSONProcessingError
+        except TypeError:
+            h_error.warning(
+                "Could not look up key \"%s\" in non-dictionary-object '%s'.",
+                key,
+                pformat(obj, indent=DEF_INDENT),
+            )
+            raise JSONProcessingError
     last_element = skip + count
     for index, element in enumerate(obj):
         if index < skip:
@@ -64,3 +73,13 @@ def process(the_json, count: int, skip: int, keys: Iterable[str]) -> List:
             json_out.append(element)
     else:
         return json_out
+
+
+def post_process(json_list: List[Any], keys: Iterable[str], format_json: bool) -> str:
+    json_out = json_list
+    # This would cause issues if json_out is large
+    if format_json:
+        text_out = pformat(json_out, indent=DEF_INDENT)
+    else:
+        text_out = str(json_out)
+    return text_out

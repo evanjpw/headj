@@ -1,4 +1,5 @@
 # headj
+
 A utility that converts input JSON arrays into valid JSON that contains only a subset of the elements
 
 [![PyPI](https://img.shields.io/pypi/v/headj?style=flat-square)](https://pypi.org/project/headj)
@@ -7,7 +8,6 @@ A utility that converts input JSON arrays into valid JSON that contains only a s
 [![PyPI - Downloads](https://img.shields.io/pypi/dm/headj?style=flat-square)](https://pypistats.org/packages/headj)
 [![PyPI - License](https://img.shields.io/pypi/l/headj?style=flat-square)](https://opensource.org/licenses/MIT)
 [![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
-
 
 ## Description
 
@@ -22,10 +22,11 @@ unpleasant to use.
 
 You _could_ just use some kind of text processor (like the unix/linux `head` command)
 but there are two issues with that:
+
 1. If the file doesn't have newlines, that's not helpful.
 2. The text processor will know nothing about JSON, so it will mangle it.
 
-You _could_ write a script/program to do the work for you. I did **that**. Then I decided to package it up so
+You _could_ write a script/program to do the work for you. I did **that**. Then I decided to package it up, so
 you don't have to.
 
 `headj` is a command line utility, similar to the `head` command, for producing a subset of a JSON file that is
@@ -61,9 +62,14 @@ Input
 command: `headj --key 'b' --count 3`
 
 output
+
 ```json
 {
-  "b": [1, 2, 3]
+  "b": [
+    1,
+    2,
+    3
+  ]
 }
 ```
 
@@ -86,7 +92,7 @@ optional arguments:
   -c COUNT, --count COUNT
                         Number of elements to copy to the output (default: 100)
   -s SKIP, --skip SKIP  Number of elements to skip before copying (default: 0)
-  -f, --format
+  -f, --format          Nicely format the output JSON with indentation & newlines.
   -o OUTPUT, --output OUTPUT
                         File to write the JSON results to (default: Standard Output)
   -d, --debug           Activate extra debugging output
@@ -96,7 +102,82 @@ optional arguments:
 
 ## Examples
 
+```shell
+poetry run headj <<- JSON
+[1,2,3,4,5]
+JSON
+# Output: [1, 2, 3, 4, 5]
+
+poetry run headj -c 1 <<- JSON
+[1,2,3,4,5]
+JSON
+# Output: [1]
+
+poetry run headj -c 1 -s 2 <<- JSON
+[1,2,3,4,5]
+JSON
+# Output: [3]
+
+poetry run headj -c 2 -s 2 <<- JSON
+[1,2,3,4,5]
+JSON
+# Output: [3, 4]
+
+poetry run headj -k 'foo' <<- JSON
+{"foo":[1,2,3,4,5]}
+JSON
+# Output: ['foo']
+
+poetry run headj -c 2 -s 2 <<- JSON
+[1,2,3,4,5]
+JSON
+# Output: [3, 4]
+
+poetry run headj -c 2 -s 2 <<- JSON
+[1,2,3,4,5]
+JSON
+# Output: [3, 4]
+
+poetry run headj -c 2 -s 2 <<- JSON
+[1,2,3,4,5]
+JSON
+# Output: [3, 4]
+
+poetry run headj -c 2 -s 2 <<- JSON
+[1,2,3,4,5]
+JSON
+# Output: [3, 4]
+
+poetry run headj -k 'foo.bar' -c 2 -s 2 <<- JSON
+{"foo":{"bar":[1,2,3,4,5]}}
+JSON
+# Output: [3, 4]
+
+poetry run headj -k 'foo.bar' -c 2 -s 2 <<- JSON
+{"foo":{
+"bar":[1,2,3,4,5]}
+}
+JSON
+# Output: [3, 4]
+
+poetry run headj -k 'foo' -c 2 -s 2 <<- JSON
+{"foo":[1,2,3,4,5]}
+JSON
+# Output: [3, 4]
+
+```
+
 ## The TBD
 
+* The `--key` is based, in the most vague sense, on the [JSON Schema](https://json-schema.org) specification.
+  It's more of a gesture in the general direction of JSON Schema. The reason that it doesn't use the full
+  JSON Schema is, the most natural way to write keys if you don't feel like reading a specification would
+  not necessarily start at the root, which would be potentially confusing. Insisting that users begin
+  with a '`$`' would likely seem arbitrary & annoying. So, the "just dots & backslashes" implementation seemed
+  reasonable.
+* The deletion of all JSON elements except the ones of interest is "bad". It needs to be fixed (or at least optional).
+* The error messages can be comically unhelpful.
+
 ## License
+
 MIT
