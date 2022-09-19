@@ -87,6 +87,13 @@ def main():
         dest="show_stack_trace",
         help="Show a stack trace for exceptions",
     )
+    parser.add_argument(
+        "-n",
+        "--no-context",
+        action="store_false",
+        help="Just return the list, don't place it in its original JSON context",
+        dest="in_context",
+    )
     args = parser.parse_args()
     arg_dict = vars(args)
     run_headj(**arg_dict)

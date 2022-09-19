@@ -69,6 +69,17 @@ class TestRunHeadj:
         o = self.run_run_headj("[1,2,3,4,5]", count=2, skip=2)
         assert o == "[3, 4]"
 
+    def test_object_1_key_context(self):
+        """
+        # Keys: ['foo']
+        poetry run headj -k 'foo' <<- JSON
+        {"foo":[1,2,3,4,5]}
+        JSON
+        # Output: [1, 2, 3, 4, 5]
+        """
+        o = self.run_run_headj('{"foo":[1,2,3,4,5]}', keys=["foo"], in_context=True)
+        assert o == '{"foo": [1, 2, 3, 4, 5]}'
+
     def test_object_1_key(self):
         """
         # Keys: ['foo']
@@ -79,6 +90,43 @@ class TestRunHeadj:
         """
         o = self.run_run_headj('{"foo":[1,2,3,4,5]}', keys=["foo"])
         assert o == "[1, 2, 3, 4, 5]"
+
+    def test_object_2_keys_2_count_2_skip_context_format(self):
+        """
+        poetry run headj -k 'foo.bar' -c 2 -s 2 <<- JSON
+        {"foo":{"bar":[1,2,3,4,5]}}
+        JSON
+        # Output: [3, 4]
+        """
+        o = self.run_run_headj(
+            '{"foo":{"bar":[1,2,3,4,5]}}',
+            keys=["foo", "bar"],
+            count=2,
+            skip=2,
+            in_context=True,
+            format_json=True,
+        )
+        assert (
+            o
+            == '{\n     "foo": {\n          "bar": [\n               3,\n'
+            + "               4\n          ]\n     }\n}"
+        )
+
+    def test_object_2_keys_2_count_2_skip_context(self):
+        """
+        poetry run headj -k 'foo.bar' -c 2 -s 2 <<- JSON
+        {"foo":{"bar":[1,2,3,4,5]}}
+        JSON
+        # Output: [3, 4]
+        """
+        o = self.run_run_headj(
+            '{"foo":{"bar":[1,2,3,4,5]}}',
+            keys=["foo", "bar"],
+            count=2,
+            skip=2,
+            in_context=True,
+        )
+        assert o == '{"foo": {"bar": [3, 4]}}'
 
     def test_object_2_keys_2_count_2_skip(self):
         """
@@ -91,6 +139,18 @@ class TestRunHeadj:
             '{"foo":{"bar":[1,2,3,4,5]}}', keys=["foo", "bar"], count=2, skip=2
         )
         assert o == "[3, 4]"
+
+    def test_object_1_key_2_count_2_skip_context(self):
+        """
+        poetry run headj -k 'foo' -c 2 -s 2 <<- JSON
+        {"foo":[1,2,3,4,5]}
+        JSON
+        # Output: [3, 4]
+        """
+        o = self.run_run_headj(
+            '{"foo":[1,2,3,4,5]}', keys=["foo"], count=2, skip=2, in_context=True
+        )
+        assert o == '{"foo": [3, 4]}'
 
     def test_object_1_key_2_count_2_skip(self):
         """

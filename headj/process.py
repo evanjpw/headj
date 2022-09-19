@@ -1,3 +1,4 @@
+import json
 import json_stream
 from pprintpp import pformat
 import sys
@@ -24,6 +25,7 @@ def run_headj(
     debug: bool = False,
     show_stack_trace: bool = False,
     keep_output_open: bool = False,
+    in_context: bool = False,
 ):
     """.msg"""
     h_error.init_config(quiet=quiet, debug=debug, show_stack_trace=show_stack_trace)
@@ -31,7 +33,7 @@ def run_headj(
         h_error.debug("Keys = %r", keys)
         the_json = json_stream.load(infile)
         json_out = process(the_json, count, skip, keys)
-        text_out = post_process(json_out, keys, format_json)
+        text_out = post_process(json_out, keys, format_json, in_context=in_context)
         output.write(text_out)
     except JSONProcessingError as e:
         h_error.warning(str(e))
@@ -86,11 +88,18 @@ def process(the_json, count: int, skip: int, keys: Iterable[str]) -> List[Any]:
         return json_out
 
 
-def post_process(json_list: List[Any], keys: Iterable[str], format_json: bool) -> str:
+# TODO: "keys" should not be `Iterable`. It should be `Reversed` or `SupportsLenAndGetItem` from typeshed/PEP 561
+def post_process(
+    json_list: List[Any],
+    keys: Iterable[str],
+    format_json: bool,
+    in_context: bool = False,
+) -> str:
     json_out = json_list
-    # This would cause issues if json_out is large
-    if format_json:
-        text_out = pformat(json_out, indent=DEF_INDENT)
-    else:
-        text_out = str(json_out)
+    # if "in_context" mode is set, place the list in the original JSON structure
+    if in_context:
+        for key in reversed(keys):
+            json_out = {key: json_out}
+    # This would cause issues if json_out is large:
+    text_out = json.dumps(json_out, indent=(DEF_INDENT if format_json else None))
     return text_out

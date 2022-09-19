@@ -126,29 +126,34 @@ JSON
 poetry run headj -k 'foo' <<- JSON
 {"foo":[1,2,3,4,5]}
 JSON
-# Output: ['foo']
+# Output: {"foo": [1, 2, 3, 4, 5]}
+
+poetry run headj -k 'foo' -n <<- JSON
+{"foo":[1,2,3,4,5]}
+JSON
+# Output: [1, 2, 3, 4, 5]
 
 poetry run headj -c 2 -s 2 <<- JSON
 [1,2,3,4,5]
 JSON
 # Output: [3, 4]
 
-poetry run headj -c 2 -s 2 <<- JSON
+poetry run headj -c 25 -s 2 <<- JSON
 [1,2,3,4,5]
 JSON
-# Output: [3, 4]
+# Output: [3, 4, 5]
 
 poetry run headj -c 2 -s 2 <<- JSON
 [1,2,3,4,5]
 JSON
 # Output: [3, 4]
 
-poetry run headj -c 2 -s 2 <<- JSON
+poetry run headj -c 2 -s 2 -f <<- JSON
 [1,2,3,4,5]
 JSON
-# Output: [3, 4]
+# Output: [\n     3,\n     4\n]
 
-poetry run headj -k 'foo.bar' -c 2 -s 2 <<- JSON
+poetry run headj -k 'foo.bar' -c 2 -s 2 -n <<- JSON
 {"foo":{"bar":[1,2,3,4,5]}}
 JSON
 # Output: [3, 4]
@@ -158,9 +163,14 @@ poetry run headj -k 'foo.bar' -c 2 -s 2 <<- JSON
 "bar":[1,2,3,4,5]}
 }
 JSON
-# Output: [3, 4]
+# Output: {"bar": {"foo": [3, 4]}}
 
 poetry run headj -k 'foo' -c 2 -s 2 <<- JSON
+{"foo":[1,2,3,4,5]}
+JSON
+# Output: {"foo": [3, 4]}
+
+poetry run headj -k 'foo' -c 2 -s 2 -n <<- JSON
 {"foo":[1,2,3,4,5]}
 JSON
 # Output: [3, 4]
@@ -181,6 +191,7 @@ JSON
   reasonable.
 * The deletion of all JSON elements except the ones of interest is "bad". It needs to be fixed (or at least optional).
 * The error messages can be comically unhelpful.
+* The examples could be improved a trifle.
 
 ## License
 

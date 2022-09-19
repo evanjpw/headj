@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "headj"
-version = "0.1.0"
+version = "0.1.1"
 description = "A utility that converts input JSON arrays into valid JSON that contains only a subset of the elements"
 authors = ["Evan Williams <ejw@fig.com>"]
 license = "MIT"
