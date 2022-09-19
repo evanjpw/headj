@@ -1,7 +1,9 @@
 from __future__ import annotations
+
 from dataclasses import dataclass
 from logging import CRITICAL, ERROR, WARNING, INFO, DEBUG
 from rich import console, theme
+import sys
 from typing import AnyStr, Optional, Union
 from typing_extensions import Self
 
@@ -68,11 +70,12 @@ class HError:
     ) -> (int, str):
         """"""
         is_exception = isinstance(e, Exception)
-
-        if (not cls._CONFIG.debug) and error_level in (
+        is_debug = error_level in (
             HErrorLevels.DEBUG,
             HErrorLevels.TRACE,
-        ):
+        )
+
+        if ((not cls._CONFIG.debug) and is_debug) or cls._CONFIG.quiet:
             return None, None
 
         if error_level is None:
@@ -81,7 +84,8 @@ class HError:
             else:
                 error_level = HErrorLevels.WARNING
         error_text = str(e)
-        print("error_level = %r" % error_level)
+        if is_debug:
+            print("error_level = %r" % error_level, file=sys.stderr)
         text_color = error_level.color
         return error_text, text_color
 

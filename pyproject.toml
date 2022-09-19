@@ -37,6 +37,11 @@ profile = "black"
 [tool.pylint.format]
 max-line-length = "88"
 
+[tool.pytest.ini_options]
+testpaths = [
+    "tests",
+]
+
 [build-system]
 build-backend = "poetry.core.masonry.api"
 requires = [

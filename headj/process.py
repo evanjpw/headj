@@ -23,8 +23,9 @@ def run_headj(
     format_json: bool = False,
     debug: bool = False,
     show_stack_trace: bool = False,
+    keep_output_open: bool = False,
 ):
-    """"""
+    """.msg"""
     h_error.init_config(quiet=quiet, debug=debug, show_stack_trace=show_stack_trace)
     try:
         h_error.debug("Keys = %r", keys)
@@ -33,11 +34,17 @@ def run_headj(
         text_out = post_process(json_out, keys, format_json)
         output.write(text_out)
     except JSONProcessingError as e:
-        h_error.debug(str(e))
+        h_error.warning(str(e))
+        if show_stack_trace:
+            raise
     except Exception as e:
+        # warning?
         h_error.print(e)
+        if show_stack_trace:
+            raise
     finally:
-        output.close()
+        if not keep_output_open:
+            output.close()
 
 
 def process(the_json, count: int, skip: int, keys: Iterable[str]) -> List[Any]:
@@ -50,19 +57,23 @@ def process(the_json, count: int, skip: int, keys: Iterable[str]) -> List[Any]:
         try:
             obj = obj[key]
         except KeyError:
-            h_error.warning(
-                'Could not find key "%s" in object "%s".',
+            msg = 'Could not find key "%s" in object "%s".' % (
                 key,
                 pformat(obj, indent=DEF_INDENT),
             )
-            raise JSONProcessingError
+            h_error.debug(
+                msg,
+            )
+            raise JSONProcessingError(msg)
         except TypeError:
-            h_error.warning(
-                "Could not look up key \"%s\" in non-dictionary-object '%s'.",
+            msg = "Could not look up key \"%s\" in non-dictionary-object '%s'." % (
                 key,
                 pformat(obj, indent=DEF_INDENT),
             )
-            raise JSONProcessingError
+            h_error.debug(
+                msg,
+            )
+            raise JSONProcessingError(msg)
     last_element = skip + count
     for index, element in enumerate(obj):
         if index < skip:
