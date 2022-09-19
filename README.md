@@ -169,7 +169,7 @@ JSON
 
 ## Documentation
 
-* [The FAQ](https://github.com/evanjpw/headj/doc/faq.md)
+* [The FAQ](https://github.com/evanjpw/headj/blob/main/doc/faq.md)
 
 ## The TBD
 
