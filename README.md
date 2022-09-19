@@ -167,6 +167,10 @@ JSON
 
 ```
 
+## Documentation
+
+* [The FAQ](https://github.com/evanjpw/headj/doc/faq.md)
+
 ## The TBD
 
 * The `--key` is based, in the most vague sense, on the [JSON Schema](https://json-schema.org) specification.
