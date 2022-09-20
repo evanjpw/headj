@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "headj"
-version = "0.1.1"
+version = "0.1.2"
 description = "A utility that converts input JSON arrays into valid JSON that contains only a subset of the elements"
 authors = ["Evan Williams <ejw@fig.com>"]
 license = "MIT"
@@ -21,6 +21,7 @@ python = "^3.9"
 json-stream = "^1.4.2"
 pprintpp = "^0.4.0"
 rich = "^12.5.1"
+typing-extensions = "^4.3.0"
 
 [tool.poetry.dev-dependencies]
 pytest = "^7.1.3"

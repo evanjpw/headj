@@ -75,6 +75,12 @@ output
 
 ## Installation
 
+### With `pipx`
+
+```shell
+pipx install headj
+```
+
 ## Usage
 
 ```
